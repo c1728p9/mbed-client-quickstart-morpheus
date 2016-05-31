@@ -4,6 +4,7 @@ This is the mbed Client example for mbed OS (we also have one for [Linux](https:
 
 The application:
 
+* Connects to network with either WiFi, Ethernet, 6LoWPAN ND or Thread connection.
 * Registers with mbed Device Connector.
 * Gives mbed Device Connector access to its resources (read and write).
 * Records the number of clicks on the device’s button and sends the number to mbed Device Connector.
@@ -11,42 +12,100 @@ The application:
 
 ## Required hardware
 
-* An [FRDM-K64F](http://developer.mbed.org/platforms/frdm-k64f/) board.
-* An Ethernet connection to the internet.
-* An Ethernet cable.
-* A micro-USB cable.
+* [FRDM-K64F](http://developer.mbed.org/platforms/frdm-k64f/) board.
+* 1-2 micro-USB cables.
+* [mbed 6LoWPAN gateway router](https://firefly-iot.com/product/firefly-6lowpan-gateway-2-4ghz/) for 6LoWPAN ND and Thread.
+* mbed 6LoWPAN shield (AT86RF212B/[AT86RF233](https://firefly-iot.com/product/firefly-arduino-shield-2-4ghz/)) for 6LoWPAN ND and Thread.
+* Ethernet cable and connection to the internet.
 
 ## Required software
 
-* An [ARM mbed account](https://developer.mbed.org/account/login/?next=/).
+* [ARM mbed account](https://developer.mbed.org/account/login/?next=/).
 * [mbed-cli](https://github.com/ARMmbed/mbed-cli) - to build the example programs. To learn how to build mbed OS applications with mbed-cli, see [the user guide](https://github.com/ARMmbed/mbed-cli/blob/master/README.md).
-* A [serial port monitor](https://developer.mbed.org/handbook/SerialPC#host-interface-and-terminal-applications).
+* [Serial port monitor](https://developer.mbed.org/handbook/SerialPC#host-interface-and-terminal-applications).
 
-## Setting up
+## Application setup
 
-To set up the example, please:
+To configure the example application, please:
 
-1. [Build the example](#Building-the-example).
-1. [Set up an IP address](#IP-address-setup). This step is optional.
-1. [Set a socket type](#Setting-socket-type). This step is optional.
+1. [Choose connection type](#connection-type).
+1. [Set client credentials](#client-credentials).
+1. [Set 6LoWPAN ND & Thread settings](#6lowpan-nd-&-thread-settings).
+1. [Set Ethernet settings](#ethernet-settings)
+1. [Set cellular settings](#cellular-settings)
+1. [Set Wi-Fi settings](#wi-fi-settings)
+1. [Set up an IP address](#ip-address-setup). This step is optional.
+1. [Set a socket type](#setting-socket-type). This step is optional.
 
-### Building the example
+### Connection type
 
-To build the example application:
+By default the application uses Ethernet as the default connection type. The connection type can be changed in the beginning of the main.cpp file by setting one of the five connection types as defined and all the rest as undefined. For example to enable 6LoWPAN ND mode:
 
-1. Clone [this](https://github.com/ARMmbed/mbed-client-quickstart-morpheus) repository.
+```
+#undef ETHERNET
+#undef WIFI
+#undef CELLULAR
+#define MESH_LOWPAN_ND
+#undef MESH_THREAD
+```
+
+### Client credentials
+
+The client side certificate needs to be created and set in order for the application to register to the Connector service.
+
 1. Go to [mbed Device Connector](https://connector.mbed.com) and log in with your mbed account.
 1. On mbed Device Connector, go to [My Devices > Security credentials](https://connector.mbed.com/#credentials) and click the **Get my device security credentials** button to get new credentials for your device.
-1. Replace the credentials in `security.h` of this project's directory with content copied above.
-1. Open a command line tool and navigate to the project’s directory.
-1. Update mbed-os sources using the `mbed update` command.
-1. Build the application by selecting the hardware board and build toolchain using the command `mbed compile -m K64F -t GCC_ARM`. mbed-cli builds a binary file under the project’s `.build` directory.
-1. Plug the Ethernet cable into the board.
-1. Plug the micro-USB cable into the **OpenSDA** port. The board is listed as a mass-storage device.
-1. Drag the binary `.build/K64F/GCC_ARM/mbed-client-quickstart-morpheus.bin` to the board to flash the application.
-1. The board is automatically programmed with the new binary. A flashing LED on it indicates that it is still working. When the LED stops blinking, the board is ready to work.
-1. Press the **RESET** button on the board to run the program.
-1. For verification, continue to the [Monitoring the application](#monitoring-the-application) chapter.
+1. Replace the contents in `security.h` of this project's directory with content copied above.
+
+### 6LoWPAN ND & Thread settings
+
+#### mbed Gateway
+
+To use the example application in 6LoWPAN ND or Thread mode, you first need set up an mbed 6LoWPAN gateway router. Clone the [mbed-client-example-6lowpan](https://github.com/ARMmbed/mbed-client-example-6lowpan) repository and follow the [gateway configuration](https://github.com/ARMmbed/mbed-client-example-6lowpan#gateway-configuration) instructions.
+
+#### Channel settings
+
+In both 6LoWPAN ND and Thread mode you need to set the channel settings to match the mbed Gateway settings. Channel settings can be found in the `MACROS.txt` file. For 2.4GHz shields (AT86RF233) use the following values:
+
+```
+YOTTA_CFG_MBED_MESH_API_6LOWPAN_ND_CHANNEL_PAGE=0
+YOTTA_CFG_MBED_MESH_API_6LOWPAN_ND_CHANNEL=12
+YOTTA_CFG_MBED_MESH_API_THREAD_CONFIG_CHANNEL_PAGE=0
+YOTTA_CFG_MBED_MESH_API_THREAD_CONFIG_CHANNEL=12
+```
+
+Values for sub GHz shields (AT86RF212B):
+
+```
+YOTTA_CFG_MBED_MESH_API_6LOWPAN_ND_CHANNEL_PAGE=2
+YOTTA_CFG_MBED_MESH_API_6LOWPAN_ND_CHANNEL=1
+YOTTA_CFG_MBED_MESH_API_THREAD_CONFIG_CHANNEL_PAGE=2
+YOTTA_CFG_MBED_MESH_API_THREAD_CONFIG_CHANNEL=1
+```
+
+For more information about the radio shields, please see the [mbed-client-example-6lowpan](https://github.com/ARMmbed/mbed-client-example-6lowpan#radio-module-identification) documentation.
+
+#### 6LoWPAN specific settings
+
+TBD
+
+#### Thread specific settings
+
+TBD
+
+
+### Ethernet settings
+
+TBD
+
+### Cellular settings
+
+TBD
+
+### Wi-Fi settings
+
+TBD
+
 
 ### IP address setup (optional)
 
@@ -67,6 +126,23 @@ To change the binding mode:
 Then re-build and flash the application.
 
 <span class="tips">**Tip:** The instructions in this document remain the same, irrespective of the socket mode you select.</span>
+
+## Building the example
+
+To build the example application:
+
+1. Clone [this](https://github.com/ARMmbed/mbed-client-quickstart-morpheus) repository.
+1. Open a command line tool and navigate to the project’s directory.
+1. Update mbed-os sources using the `mbed update` command.
+1. [Configure](#application-setup) the client application.
+1. Build the application by selecting the hardware board and build toolchain using the command `mbed compile -m K64F -t GCC_ARM -c -j0`. mbed-cli builds a binary file under the project’s `.build` directory.
+1. Plug the Ethernet cable into the board.
+1. Plug the micro-USB cable into the **OpenSDA** port. The board is listed as a mass-storage device.
+1. Drag the binary `.build/K64F/GCC_ARM/mbed-client-quickstart-morpheus.bin` to the board to flash the application.
+1. The board is automatically programmed with the new binary. A flashing LED on it indicates that it is still working. When the LED stops blinking, the board is ready to work.
+1. Press the **RESET** button on the board to run the program.
+1. For verification, continue to the [Monitoring the application](#monitoring-the-application) chapter.
+
 
 ## Monitoring the application
 
